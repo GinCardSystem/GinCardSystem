@@ -1,0 +1,28 @@
+
+# Server configuration
+server:
+  host: 127.0.0.1
+  port: 8080
+  devMode: True
+
+# Database configuration
+database:
+  driver: postgres
+  host: 192.168.10.115
+  port: 5432
+  user: root
+  password: "kdnb7RkQGpFCytDB"
+  dbname: GinCardSystem
+  location: Asia/Shanghai
+  timeout: 5
+  max_open_conns: 100
+  max_idle_conns: 20
+  conn_max_lifetime: 300
+
+# Redis configuration
+redis:
+  host: 192.168.10.115
+  port: 6379
+  user: root
+  password: Dingtalk1234561017
+  db: 1
