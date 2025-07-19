@@ -1,16 +1,17 @@
 package routes
 
 import (
-	user2 "GinCardSystem/common/services/user"
-	"github.com/gin-gonic/gin"
+	"GinCardSystem/common/services/user"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func UserRoutes(user *gin.Engine) {
-	v1 := user.Group("/api/v1/user")
+func UserRoutes(c *gin.Engine) {
+	v1 := c.Group("/api/v1/user")
 
 	// User login routes.
-	v1.GET("/login", user2.Login)
+	v1.GET("/login", user.Login)
 	v1.POST("/login", ToDoFunc)
 	v1.GET("/logout", ToDoFunc)
 
