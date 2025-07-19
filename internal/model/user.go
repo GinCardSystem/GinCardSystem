@@ -5,7 +5,7 @@ import "time"
 type UserModel struct {
 	ID            uint `gorm:"primary"`
 	UserName      string
-	Password      string
+	PasswordHash  string
 	Email         string
 	IsAdmin       bool
 	AccountStatus bool

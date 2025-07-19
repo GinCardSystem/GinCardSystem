@@ -1,66 +1,72 @@
 package config
 
 import (
-	"log"
-	"sync"
+	"fmt"
+	"os"
+	"path/filepath"
 
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
-// AppConfig 全局配置结构体（根据实际配置项定义）
-type AppConfig struct {
-	Server struct {
-		Port int `mapstructure:"port"`
-	} `mapstructure:"server"`
-	Database struct {
-		URL string `mapstructure:"url"`
-	} `mapstructure:"database"`
+// 配置结构体
+type Config struct {
+	Server   ServerConfig   `yaml:"server"`
+	Database DatabaseConfig `yaml:"database"`
+	Redis    RedisConfig    `yaml:"redis"`
+}
+
+type ServerConfig struct {
+	Host    string `yaml:"host"`
+	Port    int    `yaml:"port"`
+	DevMode bool   `yaml:"devMode"`
 }
 
 type DatabaseConfig struct {
-	Driver          string `mapstructure:"driver"` // 添加驱动类型字段
-	Host            string `mapstructure:"host"`
-	Port            int    `mapstructure:"port"`
-	User            string `mapstructure:"user"`
-	Password        string `mapstructure:"password"`
-	DBName          string `mapstructure:"dbname"`
-	Location        string `mapstructure:"location"`          // 时区
-	Timeout         int    `mapstructure:"timeout"`           // 连接超时（秒）
-	MaxOpenConns    int    `mapstructure:"max_open_conns"`    // 最大打开连接数
-	MaxIdleConns    int    `mapstructure:"max_idle_conns"`    // 最大空闲连接数
-	ConnMaxLifetime int    `mapstructure:"conn_max_lifetime"` // 连接最大生命周期（秒）
+	Driver          string `yaml:"driver"`
+	Host            string `yaml:"host"`
+	Port            int    `yaml:"port"`
+	User            string `yaml:"user"`
+	Password        string `yaml:"password"`
+	DBName          string `yaml:"dbname"`
+	Location        string `yaml:"location"`
+	Timeout         int    `yaml:"timeout"`
+	MaxOpenConns    int    `yaml:"max_open_conns"`
+	MaxIdleConns    int    `yaml:"max_idle_conns"`
+	ConnMaxLifetime int    `yaml:"conn_max_lifetime"`
 }
 
-var (
-	appConfig  *AppConfig
-	configOnce sync.Once
-)
-
-// LoadConfigFile 加载配置文件（线程安全）
-func LoadConfigFile() {
-	configOnce.Do(func() {
-		viper.SetConfigName("config")   // 文件名(不带后缀)
-		viper.SetConfigType("yaml")     // 文件类型
-		viper.AddConfigPath("./config") // 搜索路径
-
-		if err := viper.ReadInConfig(); err != nil {
-			log.Fatalf("Fatal error config file: %s \n", err)
-		}
-
-		// 解析配置到结构体
-		cfg := &AppConfig{}
-		if err := viper.Unmarshal(cfg); err != nil {
-			log.Fatalf("Unable to decode config: %v \n", err)
-		}
-
-		appConfig = cfg
-	})
+type RedisConfig struct {
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	DB       int    `yaml:"db"`
 }
 
-// GetConfig 获取配置实例（线程安全）
-func GetConfig() *AppConfig {
-	if appConfig == nil {
-		LoadConfigFile()
+var AppConfig *Config
+
+// 初始化配置 (在程序启动时调用)
+func Init() error {
+	// 获取配置文件路径
+	configPath := filepath.Join("./config/config.yaml")
+
+	// 读取配置文件
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return fmt.Errorf("读取配置文件失败: %w", err)
 	}
-	return appConfig
+
+	// 解析YAML
+	cfg := &Config{}
+	if err := yaml.Unmarshal(data, cfg); err != nil {
+		return fmt.Errorf("解析配置文件失败: %w", err)
+	}
+
+	AppConfig = cfg
+	return nil
+}
+
+// 获取配置实例 (供外部调用)
+func GetConfig() *Config {
+	return AppConfig
 }

@@ -1,18 +1,20 @@
 package main
 
 import (
-	"GinCardSystem/config"
 	"GinCardSystem/internal/db"
 	"GinCardSystem/routes"
+	"log"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
-	// 加载配置
-	config.LoadConfigFile()
-
-	db.TestQuickStart()
+	db.Init() // 初始化数据库连接
+	if err := db.Init(); err != nil {
+		log.Println("Failed to initialize database:", err)
+		panic(err)
+	}
 
 	e := gin.Default()
 	e.GET("/", ping)

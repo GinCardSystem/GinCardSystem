@@ -1,8 +1,9 @@
 package response
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // StatusSuccess http 200 response
@@ -26,5 +27,13 @@ func StatusRequestNotAllowed(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusForbidden, gin.H{
 		"message": "request not allowed",
 		"data":    "null",
+	})
+}
+
+// StatusSuccess http 400 response
+func StatusUnauthorized(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusBadRequest, gin.H{
+		"message": "bad request",
+		"data":    data, // 正确使用数据
 	})
 }

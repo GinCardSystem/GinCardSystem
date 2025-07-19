@@ -12,7 +12,7 @@ func UserRoutes(c *gin.Engine) {
 
 	// User login routes.
 	v1.GET("/login", user.Login)
-	v1.POST("/login", ToDoFunc)
+	v1.POST("/login", user.Login)
 	v1.GET("/logout", ToDoFunc)
 
 	// User register routes.
